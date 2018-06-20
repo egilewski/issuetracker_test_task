@@ -2,3 +2,4 @@
 .*.swp
 .*.un~
 trac
+issuetracker/db.sqlite3
