@@ -16,6 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic.base import RedirectView
+from django.utils.translation import ugettext_lazy
+
+
+admin.site.site_header = ugettext_lazy("Issue Tracker")
+admin.site.index_title = ugettext_lazy("Issues and related entities")
+admin.site.site_url = ''
 
 
 urlpatterns = [
