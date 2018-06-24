@@ -2,7 +2,6 @@
 from django.db.models import Min, Max, Avg, F
 from django import forms
 from django.contrib import admin
-from django.contrib.auth.models import Group
 
 from .models import Issue, IssueStatus, IssueCategory
 from .utils import round_timedelta_to_minute
@@ -41,7 +40,7 @@ class IssueAdmin(admin.ModelAdmin):
         Excludes `delete_selected` from the default list.
         """
         actions = super(IssueAdmin, self).get_actions(request)
-        del actions['delete_selected']
+        actions.pop('delete_selected', None)
         return actions
 
     def has_delete_permission(self, request, obj=None):
@@ -65,9 +64,6 @@ class IssueAdmin(admin.ModelAdmin):
         extra_context['avg_solution_time'] = round_timedelta_to_minute(
             stats['avg_solution_time'])
         return super().changelist_view(request, extra_context=extra_context)
-
-
-admin.site.unregister(Group)
 
 
 admin.site.register(Issue, IssueAdmin)
