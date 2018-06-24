@@ -1,0 +1,179 @@
+- model: core.issuestatus
+  pk: 1
+  fields: {title: kyv, description: '', is_solved: false}
+- model: core.issuestatus
+  pk: 2
+  fields: {title: solved, description: '', is_solved: true}
+- model: core.issuecategory
+  pk: 1
+  fields: {title: jvu, description: ''}
+- model: auth.user
+  fields:
+    password: pbkdf2_sha256$100000$wCaywQ0Hj2zX$ZqW9y8r6UAqnoNKmPapy9BZBjHm0XmW/Sin4q1tuMZk=
+    last_login: "2018-06-22 00:37:13.729769+00:00"
+    is_superuser: true
+    username: admin
+    first_name: ''
+    last_name: ''
+    email: root@localhost
+    is_staff: true
+    is_active: true
+    date_joined: "2018-06-22 00:37:05.558900+00:00"
+    groups: []
+    user_permissions: []
+- model: auth.user
+  fields:
+    password: pbkdf2_sha256$100000$BNfwJZwXRh1W$SutOSevqzb3OsR1PSmB/ZWBUnw9hMZyGmyYyHUe+H8A=
+    last_login: "2018-06-24 09:29:15+00:00"
+    is_superuser: false
+    username: staff
+    first_name: ''
+    last_name: ''
+    email: ''
+    is_staff: true
+    is_active: true
+    date_joined: "2018-06-24 09:28:48+00:00"
+    groups:
+    - [Staff]
+    user_permissions: []
+- model: core.issue
+  pk: 1
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:35:39.385493+00:00"
+    solved_at: "2018-06-22 01:35:37+00:00"
+- model: core.issue
+  pk: 2
+  fields:
+    title: dfgg
+    description: bsfgb
+    status: 2
+    category: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 01:40:59.739350+00:00"
+    updated_at: "2018-06-22 01:40:59.739366+00:00"
+    solved_at: "2018-06-22 01:40:59.738929+00:00"
+- model: core.issueupdate
+  pk: 1
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 1
+    category: 1
+    solved_at: null
+    issue: 1
+    submitter: [admin]
+    solver: null
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 00:50:50.399099+00:00"
+- model: core.issueupdate
+  pk: 2
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    solved_at: "2018-06-22 00:55:52.830641+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: null
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 00:55:52.831113+00:00"
+- model: core.issueupdate
+  pk: 3
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    solved_at: "2018-06-21 00:55:52+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:33:47.413108+00:00"
+- model: core.issueupdate
+  pk: 4
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 1
+    category: 1
+    solved_at: "2018-06-21 00:55:52+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:33:56.206828+00:00"
+- model: core.issueupdate
+  pk: 5
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 1
+    category: 1
+    solved_at: "2018-06-21 00:00:00+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:34:07.030644+00:00"
+- model: core.issueupdate
+  pk: 6
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    solved_at: "2018-06-22 01:34:13.756076+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:34:13.756433+00:00"
+- model: core.issueupdate
+  pk: 7
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    solved_at: "2018-06-27 01:34:13+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:35:23.828501+00:00"
+- model: core.issueupdate
+  pk: 8
+  fields:
+    title: gewrg
+    description: hvjku
+    status: 2
+    category: 1
+    solved_at: "2018-06-22 01:35:37+00:00"
+    issue: 1
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 00:50:50.399083+00:00"
+    updated_at: "2018-06-22 01:35:39.385493+00:00"
+- model: core.issueupdate
+  pk: 9
+  fields:
+    title: dfgg
+    description: bsfgb
+    status: 2
+    category: 1
+    solved_at: "2018-06-22 01:40:59.738929+00:00"
+    issue: 2
+    submitter: [admin]
+    solver: [admin]
+    created_at: "2018-06-22 01:40:59.739350+00:00"
+    updated_at: "2018-06-22 01:40:59.739366+00:00"
