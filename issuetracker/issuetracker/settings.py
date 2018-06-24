@@ -78,9 +78,16 @@ WSGI_APPLICATION = 'issuetracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'issuetracker',
+        'USER': 'issuetracker',
+        'PASSWORD': 'issuetracker',
         'TEST': {
+            # For the time being SQLite is still fine for this project's
+            # tests, but as soon as tests for the admin part will be
+            # implemented, switch to PostgreSQL will become mandatory,
+            # as issue solution stats query doesn't work on SQLite.
+            'ENGINE': 'django.db.backends.sqlite3',
             'NAME': '/dev/shm/issuetracker.test.db.sqlite3'
             if os.path.isdir('/dev/shm/') else ':memory:',
         },
@@ -125,3 +132,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'
