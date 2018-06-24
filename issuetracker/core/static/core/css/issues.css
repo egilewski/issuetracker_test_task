@@ -1,0 +1,20 @@
+.issues-stats {
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.issues-stats * {
+    float: left;
+}
+
+.issues-stats > .title {
+    margin: 0 50px 0 0;
+}
+
+.issues-stats .stat {
+    margin-right: 50px;
+}
+
+.issues-stats .stat .title {
+    margin: 0 10px 0 0;
+}

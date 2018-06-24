@@ -2,6 +2,7 @@
 from typing import Union, Iterable
 
 from django.db import models, transaction
+from django.utils import timezone
 from django.contrib.auth.models import User
 
 
@@ -10,6 +11,7 @@ class IssueStatus(models.Model):
 
     title = models.CharField(max_length=30, unique=True)
     description = models.TextField(blank=True)
+    is_solved = models.BooleanField()
 
     class Meta:
         """Meta attributes of `IssueCategory` model."""
@@ -58,6 +60,10 @@ class IssueBase(models.Model):
                                related_name='solved_issues')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    solved_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Automatically set to the current time when `status`"
+        " is changed to a solved one, unless it is changed manually.")
 
     class Meta:
         """Meta attributes of `Issue` model."""
@@ -68,6 +74,26 @@ class IssueBase(models.Model):
 class Issue(IssueBase):
     """Representation of the core object of the project - an issue."""
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        """Load field values from DB.
+
+        Save values of the field `status.is_solved` to attribute
+        `_initial_status_is_solved` and `solved_at` to attribute
+        `_initial_solved_at` for later use in `save`.
+        """
+        instance = super().from_db(db, field_names, values)
+        instance._initial_status_is_solved = instance.status.is_solved \
+            if instance.status else False
+        instance._initial_solved_at = instance.solved_at
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the instance."""
+        super().__init__(*args, **kwargs)
+        self._initial_status_is_solved = False
+        self._initial_solved_at = None
+
     def save(self,
              force_insert: (bool, "Force using SQL INSERT") = False,
              force_update: (bool, "Force using SQL UPDATE") = False,
@@ -76,20 +102,60 @@ class Issue(IssueBase):
                              "Fields which valus to save to DB. `None`"
                              " will cause all fields to be saved, empty"
                              " iterable will abort saving.") = None):
-        """Save the `Issue` and create an `IssueUpdate`."""
+        """Save the instance to DB.
+
+        If the issue becomes solved, set `solved_at` to the current
+        time. Warning: if you have passed an iterable for argument
+        `update_fields` that does not include `solved_at`, it will be
+        set on the object, but not saved to the DB.
+
+        Side effect: create `IssueUpdate`.
+        """
         if update_fields is not None and not update_fields:
             return
+        self._set_solved_at_if_became_solved(update_fields)
+
+        field_names = [field_name for field_name in
+                       {f.name for f in self._meta.get_fields()} &
+                       {f.name for f in IssueUpdate._meta.get_fields()}
+                       if field_name != 'id']
+
         with transaction.atomic():
             super().save(force_insert, force_update, using, update_fields)
-            field_names = [field_name for field_name in
-                           {f.name for f in self._meta.get_fields()} &
-                           {f.name for f in IssueUpdate._meta.get_fields()}
-                           if field_name != 'id']
-            data_source = self if update_fields is None else \
-                type(self).objects.get(pk=self.pk)
-            IssueUpdate.objects.create(
-                issue=self,
-                **{f: getattr(data_source, f) for f in field_names})
+
+            if update_fields is None:
+                fields2values = {f: getattr(self, f) for f in field_names}
+            else:
+                original_self = type(self).objects.get(pk=self.pk)
+                fields2values = {
+                    f: getattr(self if f in update_fields else original_self,
+                               f)
+                    for f in field_names}
+
+            IssueUpdate.objects.create(issue=self, **fields2values)
+
+    def _set_solved_at_if_became_solved(self, update_fields):
+        """Set `self.solved_at` and `self.solver` if appropriate.
+
+        Set `self.solved_at` to the current time if became solved and
+        wasn't changed manually (in comparison to the value the instance
+        was loaded with).
+        """
+        if self.solved_at != self._initial_solved_at:
+            should_set_solved_at = False
+        elif update_fields and 'status' not in update_fields:
+            should_set_solved_at = False
+        elif not self.status or not self.status.is_solved:
+            should_set_solved_at = False
+        elif self.pk:
+            should_set_solved_at = not self._initial_status_is_solved
+        else:
+            should_set_solved_at = True
+
+        if should_set_solved_at:
+            self.solved_at = timezone.now()
+            # In case of a second `save` call on the same object.
+            self._initial_solved_at = self.solved_at
 
     def __str__(self):
         """Return str representation of the instance."""
@@ -99,8 +165,8 @@ class Issue(IssueBase):
 class IssueUpdate(IssueBase):
     """Representation of an issue state after each modification.
 
-    Not currently read anywhere, but it's almost guaranteed that the
-    full history will be needed in the future.
+    Not currently being  read anywhere, but it's almost guaranteed that
+    the full history will be needed in the future.
     """
 
     issue = models.ForeignKey(Issue, models.CASCADE,
