@@ -1,38 +1,15 @@
 """Admin views for `core` app."""
 from django.db.models import Min, Max, Avg, F
-from django import forms
 from django.contrib import admin
 
 from .models import Issue, IssueStatus, IssueCategory
 from .utils import round_timedelta_to_minute
 
 
-class IssueAdminForm(forms.ModelForm):
-    """Admin form for `Issue` model."""
-
-    class Meta:
-        """Meta attributes of `IssueAdminForm` model."""
-
-        model = Issue
-        exclude = ('pk',)
-
-    def clean(self):
-        """Clean the form.
-
-        Adds validation error to the field `solver` if it's empty when
-        the status is a solved one.
-        """
-        status = self.cleaned_data['status']
-        if status and status.is_solved and not self.cleaned_data['solver']:
-            self.add_error('solver', "Solved status requires a solver.")
-        return self.cleaned_data
-
-
 class IssueAdmin(admin.ModelAdmin):
     """Admin options for `Issue` model."""
 
-    form = IssueAdminForm
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'submitter', 'solver')
 
     def get_actions(self, request):
         """Return list of available action.
