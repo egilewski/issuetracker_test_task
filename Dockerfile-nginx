@@ -1,0 +1,11 @@
+FROM python:3.5
+COPY issuetracker /issuetracker/
+COPY requirements.pip /
+WORKDIR /issuetracker/
+RUN pip install -r /requirements.pip && \
+    python manage.py collectstatic --noinput
+    
+FROM nginx
+RUN rm /etc/nginx/conf.d/default.conf
+COPY /nginx.conf /etc/nginx/conf.d/
+COPY --from=0 /issuetracker/static/ /static/

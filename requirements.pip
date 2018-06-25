@@ -2,3 +2,4 @@ django>=2.0,<2.1
 psycopg2-binary>=2.7,<2.8
 django-admin-view-permission>=1.6,<1.7
 pyyaml>=3.12,<4
+gunicorn>=19.8,<20

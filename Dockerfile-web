@@ -1,0 +1,9 @@
+FROM python:3.5
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
+COPY requirements.pip ./
+COPY issuetracker ./
+RUN pip install -r requirements.pip
+CMD python manage.py migrate --no-input && \
+    gunicorn issuetracker.wsgi --bind :80

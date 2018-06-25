@@ -26,7 +26,7 @@ SECRET_KEY = '+9gpg7^6z)u##in-i@yrd5nkdm#@!voo9n*-jxtbqairch4pk+'
 DEBUG = len(sys.argv) > 1 and sys.argv[1] == 'runserver'
 
 ALLOWED_HOSTS = [
-    '127.0.0.1'
+    '127.0.0.1',
 ]
 
 
@@ -79,13 +79,22 @@ WSGI_APPLICATION = 'issuetracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'issuetracker',
-        'USER': 'issuetracker',
-        'PASSWORD': 'issuetracker',
-        'TEST': {
+if len(sys.argv) < 1 or sys.argv[1] != 'test':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': 'issuetracker',
+            'HOST': 'db',
+            'PORT': '5432',
+        }
+    }
+else:
+    # Using `TEST` key does not allow to run tests when the main DB is
+    # not available.
+    DATABASES = {
+        'default': {
             # For the time being SQLite is still fine for this project's
             # tests, but as soon as tests for the admin part will be
             # implemented, switch to PostgreSQL will become mandatory,
@@ -93,9 +102,8 @@ DATABASES = {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': '/dev/shm/issuetracker.test.db.sqlite3'
             if os.path.isdir('/dev/shm/') else ':memory:',
-        },
+        }
     }
-}
 
 
 # Password validation
