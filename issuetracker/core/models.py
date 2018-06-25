@@ -5,6 +5,8 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+from .middleware import get_current_user
+
 
 class IssueStatus(models.Model):
     """Status of an issue."""
@@ -104,16 +106,20 @@ class Issue(IssueBase):
                              " iterable will abort saving.") = None):
         """Save the instance to DB.
 
-        If the issue becomes solved, set `solved_at` to the current
-        time. Warning: if you have passed an iterable for argument
-        `update_fields` that does not include `solved_at`, it will be
-        set on the object, but not saved to the DB.
+        If the issue is created, `submitter` will be set to the current
+        user. If the issue becomes solved, `solver` will be set to the
+        current user, and `solved_at` to the current time. Warning: if
+        you have passed an iterable for argument `update_fields` that
+        does not include fields named above, they will be set on the
+        object, but not saved to the DB.
 
         Side effect: create `IssueUpdate`.
         """
         if update_fields is not None and not update_fields:
             return
-        self._set_solved_at_if_became_solved(update_fields)
+        if not self.pk:
+            self.submitter = get_current_user()
+        self._set_solver_and_solved_at_if_became_solved(update_fields)
 
         field_names = [field_name for field_name in
                        {f.name for f in self._meta.get_fields()} &
@@ -134,7 +140,7 @@ class Issue(IssueBase):
 
             IssueUpdate.objects.create(issue=self, **fields2values)
 
-    def _set_solved_at_if_became_solved(self, update_fields):
+    def _set_solver_and_solved_at_if_became_solved(self, update_fields):
         """Set `self.solved_at` and `self.solver` if appropriate.
 
         Set `self.solved_at` to the current time if became solved and
@@ -142,17 +148,18 @@ class Issue(IssueBase):
         was loaded with).
         """
         if self.solved_at != self._initial_solved_at:
-            should_set_solved_at = False
+            became_solved = False
         elif update_fields and 'status' not in update_fields:
-            should_set_solved_at = False
+            became_solved = False
         elif not self.status or not self.status.is_solved:
-            should_set_solved_at = False
+            became_solved = False
         elif self.pk:
-            should_set_solved_at = not self._initial_status_is_solved
+            became_solved = not self._initial_status_is_solved
         else:
-            should_set_solved_at = True
+            became_solved = True
 
-        if should_set_solved_at:
+        if became_solved:
+            self.solver = get_current_user()
             self.solved_at = timezone.now()
             # In case of a second `save` call on the same object.
             self._initial_solved_at = self.solved_at
